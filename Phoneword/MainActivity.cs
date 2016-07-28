@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Runtime;
@@ -11,6 +12,8 @@ namespace Phoneword
     [Activity(Label = "Phone Word", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : Activity
     {
+        static readonly List<string> phoneNumbers = new List<string>();
+
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
@@ -21,6 +24,7 @@ namespace Phoneword
             EditText phoneNumberText = FindViewById<EditText>(Resource.Id.PhoneNUmberText);
             Button translateButton = FindViewById<Button>(Resource.Id.TranslateButton);
             Button callButton = FindViewById<Button>(Resource.Id.CallButton);
+            Button callHistoryButton = FindViewById<Button>(Resource.Id.CallHistoryButton);
 
             //disable the call button
             callButton.Enabled = false;
@@ -48,6 +52,12 @@ namespace Phoneword
                 callDialog.SetMessage("Call " + translatedNumber + "?");
                 callDialog.SetNeutralButton("Call", delegate
                 {
+                    //add number to history:
+                    phoneNumbers.Add(translatedNumber);
+                    //enable the call history button
+                    callHistoryButton.Enabled = true;
+
+                    //create the intent to dial phone
                     var callIntent = new Intent(Intent.ActionCall);
                     callIntent.SetData(Android.Net.Uri.Parse("tel:" + translatedNumber));
                     StartActivity(callIntent);
@@ -55,6 +65,13 @@ namespace Phoneword
                 callDialog.SetNegativeButton("Cancel", delegate { });
 
                 callDialog.Show();
+            };
+
+            callHistoryButton.Click += (sender, e) =>
+            {
+                var intent = new Intent(this, typeof(CallHistoryActivity));
+                intent.PutStringArrayListExtra("phone_numbers", phoneNumbers);
+                StartActivity(intent);
             };
         }
     }

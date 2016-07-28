@@ -12,14 +12,16 @@ using Android.Widget;
 
 namespace Phoneword
 {
-    [Activity(Label = "CallHistoryActivity")]
-    public class CallHistoryActivity : Activity
+    [Activity(Label = "@string/callHistory")]
+    public class CallHistoryActivity : ListActivity
     {
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle bundle)
         {
-            base.OnCreate(savedInstanceState);
+            base.OnCreate(bundle);
 
             // Create your application here
+            var phoneNumbers = Intent.Extras.GetStringArrayList("phone_numbers") ?? new string[0];
+            this.ListAdapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, phoneNumbers);
         }
     }
 }
